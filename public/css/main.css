@@ -1,0 +1,13 @@
+body {
+	background-color: goldenrod;
+}
+
+input {
+	display: block;
+	text-align: center;
+}
+
+.large {
+	height: 200px;
+	width: 400px;
+}

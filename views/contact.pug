@@ -1,0 +1,19 @@
+extends layout.pug
+
+block content
+	.row
+		h1.col-sm-4.col-sm-offset-5 Contact Us
+	.row
+		h4.col-sm-4.col-sm-offset-5 Go on and Tell us things
+	.row
+		.col-sm-4.col-sm-offset-5
+			form(method='POST')
+				label(for='name') Name
+				input(type='text' name='name' placeholder='Name')
+				label(for='email') Email
+				input(type='text' name='email' placeholder='Email')
+				label(for='message') Message
+				input(class='large' name='message' type='text' placeholder='Shit you want to say...')
+				button Submit
+
+
