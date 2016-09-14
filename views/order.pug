@@ -1,0 +1,29 @@
+extends layout.pug
+
+block content
+	.row
+		h1.col-sm-4.col-sm-offset-5 Order
+	.row
+		h4.col-sm-4.col-sm-offset-5 Want to order the last pizza you'll ever eat?
+	.row
+		.col-sm-4.col-sm-offset-5
+			form(method='POST')
+				label(for='name') Name
+				input.form-control(type='text' name='name' placeholder='Name')
+				label(for='email') Email
+				input.form-control(type='text' name='email' placeholder='Email')
+				label(for='phone') Phone
+				input.form-control(type='tel' name='phone' placeholder='Phone')
+				label(for='size') Size
+				select.form-control(name='size')
+					option
+					option(value='10') Small: 10"
+					option(value='12') Medium: 12"
+					option(value='14') Large: 14"
+					option(value='20') Murica: 20"
+				label(for='message') Message
+				input.form-control(class='large' name='message' type='text' placeholder='Sweet dreams await...')
+				button Submit
+
+
+

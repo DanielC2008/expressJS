@@ -2,8 +2,8 @@
 
 const { Router } = require('express')
 const router = Router()
-
-const { db } = require('../database')
+const Contact = require('../models/contact')
+const Order = require('../models/order')
 
 router.get('/', (req, res) =>
   res.render('index')
@@ -17,8 +17,6 @@ router.get('/contact', (req, res) =>
   res.render('contact', { page: 'Contact' })
 )
 
-const mongoose = require('mongoose')
-const Contact = mongoose.model('Contact')
 
 router.post('/contact', (req, res) => {
 	// mongoose way
@@ -29,6 +27,17 @@ router.post('/contact', (req, res) => {
   //   .insertOne(req.body)
     .then(() => res.redirect('/'))
     .catch(() => res.send('BAD'))
+})
+
+router.get('/order', (req, res) =>
+	res.render('order', {page: 'Order'})
+)
+
+router.post('/order', (req, res) => {
+	const order = new Order(req.body)
+	order.save()
+	.then(() => res.redirect('/'))
+	.catch(() => res.send('Order not Processed. Try again'))
 })
 
 module.exports = router
