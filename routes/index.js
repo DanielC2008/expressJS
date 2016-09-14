@@ -4,6 +4,8 @@ const { Router } = require('express')
 const router = Router()
 const Contact = require('../models/contact')
 const Order = require('../models/order')
+const Size = require('../models/size')
+const Toppings = require('../models/toppings')
 
 router.get('/', (req, res) =>
   res.render('index')
@@ -29,11 +31,20 @@ router.post('/contact', (req, res, err) => {
   .catch(err)
 })
 
-router.get('/order', (req, res) =>
-	res.render('order', {page: 'Order'})
+router.get('/order', (req, res, err) =>
+	Promise
+		.all([
+		Size.find().sort({inches: 1}),
+		Toppings.find().sort({name:1})
+	])
+	.then(([sizes, toppings]) =>
+		res.render('order', {page: 'Order', sizes, toppings})
+	)
+	.catch(err)
 )
 
-router.post('/order', (req, res) => {
+
+router.post('/order', (req, res, err) => {
 	Order
 	.create(req.body)
 	.then(() => res.redirect('/'))

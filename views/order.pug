@@ -16,12 +16,14 @@ block content
 				input.form-control(type='tel' name='phone' placeholder='Phone')
 				label(for='size') Size
 				select.form-control(name='size')
-					option
-					option(value='10') Small: 10"
-					option(value='12') Medium: 12"
-					option(value='14') Large: 14"
-					option(value='20') Murica: 20"
-				label(for='message') Message
+					option(value=null) Select a size:
+					each size in sizes
+						option(value=size.inches) #{size.name}: #{size.inches}
+				label(for='toppings') Select Toppings:
+					each topping in toppings
+						input(value=topping.name name='toppings' type='checkbox')
+						| #{topping.name}
+				label(for='message')
 				input.form-control(class='large' name='message' type='text' placeholder='Sweet dreams await...')
 				button Submit
 
