@@ -18,15 +18,15 @@ router.get('/contact', (req, res) =>
 )
 
 
-router.post('/contact', (req, res) => {
+router.post('/contact', (req, res, err) => {
 	// mongoose way
-  const msg = new Contact(req.body)
-  msg.save()
+ Contact
+ 	.create(req.body)
   // mongo way
   // db().collection('contact')
   //   .insertOne(req.body)
-    .then(() => res.redirect('/'))
-    .catch(() => res.send('BAD'))
+  .then(() => res.redirect('/'))
+  .catch(err)
 })
 
 router.get('/order', (req, res) =>
@@ -34,10 +34,10 @@ router.get('/order', (req, res) =>
 )
 
 router.post('/order', (req, res) => {
-	const order = new Order(req.body)
-	order.save()
+	Order
+	.create(req.body)
 	.then(() => res.redirect('/'))
-	.catch(() => res.send('Order not Processed. Try again'))
+	.catch(err)
 })
 
 module.exports = router
