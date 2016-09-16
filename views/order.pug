@@ -1,6 +1,8 @@
 extends layout.pug
 
 block content
+	if msg
+		h1 = mg
 	.row
 		h1.col-sm-4.col-sm-offset-5 Order
 	.row
@@ -9,14 +11,14 @@ block content
 		.col-sm-4.col-sm-offset-5
 			form(method='POST')
 				label(for='name') Name
-				input.form-control(type='text' name='name' placeholder='Name')
+				input.form-control(type='text' name='name' placeholder='Name' required)
 				label(for='email') Email
-				input.form-control(type='text' name='email' placeholder='Email')
+				input.form-control(type='text' name='email' placeholder='Email' required)
 				label(for='phone') Phone
-				input.form-control(type='tel' name='phone' placeholder='Phone')
+				input.form-control(type='tel' name='phone' placeholder='Phone' required)
 				label(for='size') Size
-				select.form-control(name='size')
-					option(value=null) Select a size:
+				select.form-control(name='size' required)
+					option(disabled selected) Select a size:
 					each size in sizes
 						option(value=size.inches) #{size.name}: #{size.inches}
 				label(for='toppings') Select Toppings:
