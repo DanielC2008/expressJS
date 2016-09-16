@@ -18,10 +18,10 @@ connect()
 	)
 	.then( () =>
 		Toppings.insertMany([
-			{title: 'Pepperoni'},
-			{title: 'Sausage'},
-			{title: 'Knives'}
+			{name: 'Pepperoni'},
+			{name: 'Sausage'},
+			{name: 'Knives'}
 		])
 	)
-	.then(disconnect)
 	.catch(console.error)
+	.then(disconnect)
