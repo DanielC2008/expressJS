@@ -1,50 +1,81 @@
-"use strict";
+'use strict';
 
-const express = require('express')
-const bodyParser = require('body-parser')
-const app = express()
-const {cyan, red} = require('chalk')
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+//Pass db into the routes function
+const routes = require('./routes/');
+//Importing the mongodb connection
+const { connect } = require('./database');
 
-const routes = require('./routes/')
+//Set an 'env' var of port to use that port #
+//Otherwise use port 3000
+const port = process.env.PORT || 3000;
+app.set('port', port);
+/////////////////////////////////////////
 
-app.set('PORT', process.env.PORT || 3000)
 
+/////////////////////////////////////////
+//Middle-ware
+
+//Custom middleware
+//Can create route specific middleware ie: '/user/:id'
+app.use((req, res, next) => {
+  //Log out a string that emulates 'HS' log
+  console.log(`[${new Date()}] "${req.method} ${req.url}" ${req.headers['user-agent']}`);
+  //Need to execute callback for server to continue
+  next();
+});
+
+//Set the view engine to pug
 app.set('view engine', 'pug');
-
-if (process.env.NODE_ENV !== 'production') {
+//Allow to set to production env to make it 'prettified'
+if ( process.env.NODE_ENV === 'production' ) {
   app.locals.pretty = true;
 }
+//Serve up a static index.html file here
+app.use(express.static('public'));
 
-//Middlewares
-app.use((req, res, next) => {
-	console.log(`[${new Date().toString()}] "${cyan(req.method)} ${cyan(req.url)}" "${req.headers['user-agent']}"`)
-	next()
-})
-app.use(express.static('public'))
-app.use(bodyParser.urlencoded({ extended: false }))
+//'app.locals' is a way to set a global variable for your templating engine. Can use this on each .pug file
+app.locals.company = 'Pizza Death!';
 
-app.locals.company = 'Pizza Death!'
+//This listens for form data, and then parses the form data into a readable obj
+app.use(bodyParser.urlencoded({extended: false}));
+/////////////////////////////////////////
 
-// routes
-app.use(routes)
 
-app.use((req, res) => {
-// 404 catch and pass to error handler
-	// const err = Error('Not Found')
-	// err.status = 404
-	// next(err)
-	res.render('404.pug')
-})
+/////////////////////////////////////////
+// Routes
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-	res.sendStatus(500)
-	console.error(
-		`[${new Date().toString()}] "${red(req.method)} ${red(req.url)}" "Error (${res.statusCode}): "${res.statusMessage}"`
-	)
-	console.error(err.stack)
-})
+//Use the routes moudule
+app.use(routes);
 
-app.listen(app.get('PORT'), () => {
-  console.log(`Hey, I'm listening on port ${app.get('PORT')}`);
-})
+//404 catch and forward to error handling middle-ware
+//Catches anything that is not a route
+app.use( (req, res) => {
+  res.render('404.pug');
+});
+
+//Error handling middlewares
+app.use( (err, req, res, next) => {
+  //Error shorthand, sends error and message
+  res.sendStatus(err.status || 500);
+  console.error('Error occured');
+  //When handling errors, you can send appropriate status codes
+  console.error(`[${new Date()}] "${req.method} ${req.url}" Error(${res.statusCode}) ${res.statusMessage}`);
+
+  console.error(err.stack);
+});
+/////////////////////////////////////////
+
+
+/////////////////////////////////////////
+//Server listening on port 3000
+connect()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Express server listening on port ${port}`);
+    });
+  })
+  .catch(console.error);
+/////////////////////////////////////////

@@ -1,25 +1,54 @@
-"use strict"
+'use strict'
 
-const {Router} = require('express')
+const { Router } = require('express')
 const router = Router()
+const Contact = require('../models/contact')
+const Order = require('../models/order')
+const Size = require('../models/size')
+const Toppings = require('../models/toppings')
 
-	router.get('/', (req, res) => {
-	  res.render('index.pug')
-	})
+router.get('/', (req, res) =>
+  res.render('index')
+)
 
-	router.get('/about', (req, res) => {
-	  res.render('about.pug', { page: 'About'})
-	})
+router.get('/about', (req, res) =>
+  res.render('about', { page: 'About' })
+)
 
-	router.get('/contact', (req, res) => {
-	  res.render('contact.pug', { page: 'Contact'})
-	})
+router.get('/contact', (req, res) =>
+  res.render('contact', { page: 'Contact' })
+)
 
 
-	router.post('/contact', (req, res) => {
-	  console.log(req.body)
-	  res.redirect('/')
-	})
+router.post('/contact', (req, res, err) => {
+	// mongoose way
+ Contact
+ 	.create(req.body)
+  // mongo way
+  // db().collection('contact')
+  //   .insertOne(req.body)
+  .then(() => res.redirect('/'))
+  .catch(err)
+})
 
+router.get('/order', (req, res, err) =>
+	Promise
+		.all([
+		Size.find().sort({inches: 1}),
+		Toppings.find().sort({name:1})
+	])
+	.then(([sizes, toppings]) =>
+		res.render('order', {page: 'Order', sizes, toppings})
+	)
+	.catch(err)
+)
+
+
+router.post('/order', (req, res, err) => {
+	Order
+	.create(req.body)
+	.then(() => res.redirect('/'))
+	.catch(err)
+})
 
 module.exports = router
