@@ -3,6 +3,7 @@
 const { Router } = require('express')
 const router = Router()
 const Contact = require('../models/contact')
+const User = require('../models/user')
 const Order = require('../models/order')
 const Size = require('../models/size')
 const Toppings = require('../models/toppings')
@@ -43,12 +44,43 @@ router.get('/order', (req, res, err) =>
 	.catch(err)
 )
 
-
 router.post('/order', (req, res, err) => {
 	Order
 	.create(req.body)
 	.then(() => res.redirect('/'))
 	.catch(err)
+})
+
+
+router.get('/login', (req, res, err) => {
+	res.render('login')
+})
+
+router.post('/login', (req, res, err) => {
+	User.find({email: req.body.email})
+	.then((currUser) => {
+		if(currUser[0].password === req.body.password) {
+		res.redirect('/')
+	} else {
+		res.render('login', { error: 'Email & password combination does not match'})
+	}
+	})
+})
+
+router.get('/register', (req, res, err) => {
+	res.render('register')
+})
+
+router.post('/register', (req, res, err) => {
+	if(req.body.password === req.body.confirmation) {
+		User
+		.create(req.body)
+		.then(() => res.redirect('/'))
+		.catch(err)
+	} else {
+		res.render('register', { error: 'Password confirmation failed'})
+	}
+
 })
 
 module.exports = router
