@@ -7,17 +7,39 @@ const bodyParser = require('body-parser');
 const routes = require('./routes/');
 //Importing the mongodb connection
 const { connect } = require('./database');
-
+const session = require('express-session')
+const RedisStore = require('connect-redis')(session)
 //Set an 'env' var of port to use that port #
 //Otherwise use port 3000
 const port = process.env.PORT || 3000;
 app.set('port', port);
 /////////////////////////////////////////
 
+//Set the view engine to pug
+app.set('view engine', 'pug');
+//Allow to set to production env to make it 'prettified'
+if ( process.env.NODE_ENV === 'production' ) {
+  app.locals.pretty = true;
+}
+//'app.locals' is a way to set a global variable for your templating engine. Can use this on each .pug file
+app.locals.company = 'Pizza Death!';
+
 
 /////////////////////////////////////////
 //Middle-ware
 
+//This listens for form data, and then parses the form data into a readable obj
+app.use(bodyParser.urlencoded({extended: false}));
+
+app.use(session({
+  store: new RedisStore(),
+  secret: 'fliesandpies'
+}))
+//assign the email to locals.user so it persists through reload
+app.use((req, res, next) => {
+  app.locals.email = req.session.email
+  next()
+})
 //Custom middleware
 //Can create route specific middleware ie: '/user/:id'
 app.use((req, res, next) => {
@@ -27,20 +49,10 @@ app.use((req, res, next) => {
   next();
 });
 
-//Set the view engine to pug
-app.set('view engine', 'pug');
-//Allow to set to production env to make it 'prettified'
-if ( process.env.NODE_ENV === 'production' ) {
-  app.locals.pretty = true;
-}
 //Serve up a static index.html file here
 app.use(express.static('public'));
 
-//'app.locals' is a way to set a global variable for your templating engine. Can use this on each .pug file
-app.locals.company = 'Pizza Death!';
 
-//This listens for form data, and then parses the form data into a readable obj
-app.use(bodyParser.urlencoded({extended: false}));
 /////////////////////////////////////////
 
 
