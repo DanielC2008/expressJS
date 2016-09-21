@@ -1,105 +1,22 @@
 'use strict'
 
 const { Router } = require('express')
-const { hash, genSaltSync, compare} = require('bcrypt-nodejs')
+
+const home = require('./home')
+const about = require('./about')
+const contact = require('./contact')
+const login = require('./login')
+const register = require('./register')
+const order = require('./order')
+const logout = require('./logout')
 
 const router = Router()
 
-const Contact = require('../models/contact')
-const Order = require('../models/order')
-const Size = require('../models/size')
-const Topping = require('../models/toppings')
-const User = require('../models/user')
-
-router.get('/', (req, res) =>
-  res.render('index')
-)
-
-router.get('/about', (req, res) =>
-  res.render('about', { page: 'About' })
-)
-
-router.get('/contact', (req, res) =>
-  res.render('contact', { page: 'Contact' })
-)
-
-router.post('/contact', (req, res, err) =>
-  Contact
-    .create(req.body)
-    .then(() => res.redirect('/'))
-    .catch(err)
-)
-
-router.get('/login', (req, res) =>
-  res.render('login')
-)
-
-router.post('/login', ({ session, body: { email, password } }, res, err) => {
-  User.findOne({ email })
-    .then(user => {
-      if (user) {
-        return new Promise((resolve, reject) => {
-          compare(password, user.password, (err, matches) => {
-            if (err) {
-              reject(err)
-            } else {
-              resolve(matches)
-            }
-          })
-        })
-      } else {
-        res.render('login', { msg: 'Email does not exist in our system' })
-      }
-    })
-    .then((matches) => {
-      if (matches) {
-      	session.email = email
-        res.redirect('/')
-      } else {
-        res.render('login', { msg: 'Password does not match' })
-      }
-    })
-    .catch(err)
-})
-
-router.get('/register', (req, res) =>
-  res.render('register')
-)
-
-router.post('/register', ({ body: { email, password, confirmation } }, res, err) => {
-  if (password === confirmation) {
-    User.findOne({ email })
-      .then(user => {
-        if (user) {
-          res.render('register', { msg: 'Email is already registered' })
-        } else {
-          return new Promise((resolve, reject) => {
-            hash(password, genSaltSync(13), null, function(err, hash) {
-            	console.log('line 78');
-              if (err) {
-                reject(err)
-              } else {
-                resolve(hash)
-              }
-            })
-          })
-        }
-      })
-      .then(hash => User.create({ email, password: hash }))
-      .then(() => res.redirect('/login'))
-      .catch(err)
-  } else {
-    res.render('register', { msg: 'Password & password confirmation do not match' })
-  }
-})
-
-
-router.post('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) throw err
-    res.redirect('/login')
-  })
-})
+router.use(home)
+router.use(about)
+router.use(contact)
+router.use(login)
+router.use(register)
 
 /////////////////////login guard middleware
 router.use((req, res, next) => {
@@ -109,52 +26,8 @@ router.use((req, res, next) => {
 		res.redirect('/login')
 	}
 })
-
 ////////////////////////everything below this is only accessible if you are logged in
-
-router.get('/order', (req, res, err) =>
-  Promise
-    .all([
-      Size.find().sort({ inches: 1 }),
-      Topping.find().sort({ name: 1 }),
-    ])
-    .then(([
-        sizes,
-        toppings,
-      ]) =>
-      res.render('order', { page: 'Order', sizes, toppings })
-    )
-    .catch(err)
-)
-
-router.post('/order', ({ body }, res, err) => {
-  Order
-    .create(body)
-    .then(() => res.redirect('/'))
-    .catch(({ errors })  =>
-      Promise.all([ // retrieve sizes and toppings again,
-        Promise.resolve(errors), // but pass the errors along as well
-        Size.find().sort({ inches: 1 }),
-        Topping.find().sort({ name: 1 }),
-      ])
-    )
-    .then(([
-        errors,
-        sizes,
-        toppings,
-      ]) =>
-      // UI/UX additions
-      // send errors to renderer to change styling and add error messages
-      // also, send the req.body to use as initial form input values
-      res.render('order', { page: 'Order', sizes, toppings, errors, body })
-    )
-    .catch(err)
-}
-)
-
-router.get('/logout', (req, res) => {
-	res.render('logout', { page: 'Logout'})
-})
-
+router.use(order)
+router.use(logout)
 
 module.exports = router
