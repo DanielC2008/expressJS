@@ -1,9 +1,6 @@
 'use strict'
 
 const { Router } = require('express')
-const { hash, genSaltSync, compare} = require('bcrypt-nodejs')
-
-const router = Router()
 
 const home = require('./home')
 const about = require('./about')
@@ -12,6 +9,8 @@ const login = require('./login')
 const register = require('./register')
 const order = require('./order')
 const logout = require('./logout')
+
+const router = Router()
 
 router.use(home)
 router.use(about)
