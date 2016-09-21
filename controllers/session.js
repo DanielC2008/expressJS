@@ -3,6 +3,7 @@
 const { compare } = require('bcrypt-nodejs')
 const User = require('../models/user')
 
+//////LOGIN
 module.exports.new = (req, res) => res.render('login')
 
 module.exports.create = ({ session, body: { email, password } }, res, err) => {
@@ -31,4 +32,14 @@ module.exports.create = ({ session, body: { email, password } }, res, err) => {
       }
     })
     .catch(err)
+}
+
+//////LOGOUT
+module.exports.edit = (req, res) => res.render('logout', { page: 'Logout'})
+
+module.exports.destroy =  (req, res) => {
+  req.session.destroy(err => {
+    if (err) throw err
+    res.redirect('/login')
+  })
 }

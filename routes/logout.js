@@ -2,7 +2,7 @@
 
 const { Router } = require('express')
 
-const logout = require('../controllers/logout')
+const logout = require('../controllers/session')
 
 const router = Router()
 

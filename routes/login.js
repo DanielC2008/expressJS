@@ -1,7 +1,7 @@
 'use strict'
 
 const { Router } = require('express')
-const login = require('../controllers/login')
+const login = require('../controllers/session')
 
 const router = Router()
 
