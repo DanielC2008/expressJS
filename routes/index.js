@@ -20,7 +20,7 @@ router.use(register)
 
 /////////////////////login guard middleware
 router.use((req, res, next) => {
-	if(req.session.email) {
+	if(req.user.email) {
 		next()
 	} else {
 		res.redirect('/login')
