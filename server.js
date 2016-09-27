@@ -9,6 +9,9 @@ const routes = require('./routes/');
 const { connect } = require('./database');
 const session = require('express-session')
 const RedisStore = require('connect-redis')(session)
+
+const passport = require('passport')
+require('./passport-config')
 //Set an 'env' var of port to use that port #
 //Otherwise use port 3000
 const port = process.env.PORT || 3000;
@@ -28,16 +31,23 @@ app.locals.company = 'Pizza Death!';
 /////////////////////////////////////////
 //Middle-ware
 
+
+
 //This listens for form data, and then parses the form data into a readable obj
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(session({
-  store: new RedisStore(),
+  store: new RedisStore({
+    url: process.env.REDIS_URL || "redis://localhost:6379"
+  }),
   secret: 'fliesandpies'
 }))
+//initialize and create session for passport
+app.use(passport.initialize())
+app.use(passport.session())
 //assign the email to locals.user so it persists through reload
 app.use((req, res, next) => {
-  app.locals.email = req.session.email
+  app.locals.email = req.user && req.user.email
   next()
 })
 //Custom middleware
